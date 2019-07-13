@@ -1,13 +1,12 @@
 const Koa = require('koa');
-const koaBody = require('koa-body');
 const config = require('./config/config.js');
 const logger = require('koa-logger');
 const json = require('koa-json');
 const error = require('koa-json-error');
 const routing = require('./router/index');
 const mongoose = require('mongoose');
-const paramter = require('koa-parameter');
 const bodyParser = require('koa-bodyparser');
+const config = require('./config/config');
 
 function formatError(err) {
 	return {
@@ -16,9 +15,11 @@ function formatError(err) {
 		success: false,
 	};
 };
+// 实例化koa
 const app = new Koa();
 
-mongoose.connect('mongodb://localhost:27017/mock', {useNewUrlParser: true}, (err) => {
+//连接数据库'mongodb://localhost:27017/mock'
+mongoose.connect(config.mongodb.url, {useNewUrlParser: true}, (err) => {
 	if (err) {
 		console.log(`error:  ${err}`);
 		return;
@@ -27,32 +28,24 @@ mongoose.connect('mongodb://localhost:27017/mock', {useNewUrlParser: true}, (err
 })
 mongoose.connection.on('error', console.error);
 
-// instantiate Koa
 app.use(logger());
 app.use(json());
-
-// app.use(koaBody({ // 为了解析post数据，koa并未对参数进行封装
-// 	// patchNode: true,
-// 	// multipart: true,
-// 	formidable: {
-// 		// uploadDir: path.join(__dirname, '/public'),
-// 		keepExtensions: true,
-// 	},
-// 	onError: (err) => console.log(`error: ${err}`),
-// }));
 app.use(bodyParser());
-// const router = new route();
-// router.post('/kk', ctx => console.log(ctx.request.body));
-// app.use(router.routes()).use(router.allowedMethods());
+
+app.use(async (ctx, next) => {
+	console.log(`请求信息： \n 方式： ${ctx.request.method}  \n 地址： ${ctx.request.url}`);
+	await next();
+});
 
 app.use(error({
 	format: formatError,
 }));
 
+// 路由
 routing(app);
 
 
 // listen post--8888
-app.listen(config.port, () => {
+app.listen(config.app.port, () => {
 	console.log('start koa-server !');
 });
