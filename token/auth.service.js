@@ -9,12 +9,12 @@ const authService = async (ctx, next) => {
   if (authorization === '') {
     ctx.throw(401, 'no token detected in http header \'Authorization\'');
   }
-  console.log(`token: ${token}`);
   const token = authorization.split(' ')[1];
+  console.log(`token: ${token}`);
   let tokenContent;
   try {
     tokenContent = await jwt.verify(token, config.jwt.secret);
-    console.log(`tokenContent: ${tokenContent}`);
+    // console.log(`tokenContent: ${tokenContent}`);
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
       ctx.throw(401, 'token expired, plz save native data');

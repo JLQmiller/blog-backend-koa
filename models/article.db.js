@@ -3,8 +3,9 @@ const mongoose = require('mongoose');
 // const moment = require('moment');
 
 const Schema = mongoose.Schema;
-const articleSchema = {
+const article = {
   title: String,
+  abstract: String,
   content: String,
   creatTime: {
     type: Date,

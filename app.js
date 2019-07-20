@@ -6,7 +6,6 @@ const error = require('koa-json-error');
 const routing = require('./router/index');
 const mongoose = require('mongoose');
 const bodyParser = require('koa-bodyparser');
-const config = require('./config/config');
 
 function formatError(err) {
 	return {

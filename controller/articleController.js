@@ -8,12 +8,24 @@ const Article = require('../models/article.db');
  *  content: string
  *        
  */
-const createArticle = async (ctx) => {
+exports.createArticle = async function createArticle(ctx) {
   console.log(`create req-body: ${ctx.request.body}`);
   const title = ctx.request.body.title;
+  const abstract = ctx.request.body.abstract;
   const content = ctx.request.body.content;
   const createTime = new Date();
   const publish = ctx.request.body.publish;
+  const article = await Article.findOne({'title': title});
+  console.log(ctx.request.body);
+  console.log(`查询重复的文章233： ${article}`);
+  if (!!article) {
+    ctx.body = {
+      success: false,
+      errorInfo: '已存在文章',
+    };
+    console.log('文章重复')
+    return;
+  }
   if (title === '') {
     ctx.throw(400, '标题不能为空');
   }
@@ -22,8 +34,10 @@ const createArticle = async (ctx) => {
   }
   const articleInfo = new Article({
     title,
+    abstract,
     content,
-    createTime,
+    // createTime,
+    publish,
   });
   let createResult = await articleInfo.save().catch(err => {
     ctx.throw(500, '服务器出错');
@@ -58,13 +72,13 @@ const findPaging = (pageNumber, pageSize) => {
 };
 
 // 查询所有文章
-const findAllArticles = async (ctx) => {
+exports.findAllArticles =  async function findAllArticles(ctx) {
   console.log('查找所有文章');
   console.log(`getArticle-body: ${ctx.request.body}`);
   let pageNumber = ctx.request.body.pageNumber;
   let pageSize = ctx.request.body.pageSize;
   let doc = await findPaging(pageNumber, pageSize);
-  console.log(doc);
+  // console.log(doc);
   console.log('文章为空');
   ctx.status = 200;
   ctx.body = {
@@ -73,7 +87,7 @@ const findAllArticles = async (ctx) => {
 }
 
 // 应发布文章分页
-const findPublishPaging = (pageNumber, pageSize) => {
+const findPublishPaging = async function fetchPublishPaging(pageNumber, pageSize) {
   console.log('start findArticles');
   return new Promise((resolve, reject) => {
     Article.find({ publish: true })
@@ -90,7 +104,7 @@ const findPublishPaging = (pageNumber, pageSize) => {
 };
 
 // 获取所有应发布文章
-const findAllPublishArticles = async (ctx) => {
+exports.findAllPublishArticles = async function findAllPublishArticles(ctx) {
   console.log('查找所有应发表文章');
   let pageNumber = ctx.request.body.pageNumber;
   let pageSize = ctx.request.body.pageSize;
@@ -103,10 +117,11 @@ const findAllPublishArticles = async (ctx) => {
 }
 
 // 修改特定文章
-const modifyArticle = async (ctx) => {
+exports.modifyArticle = async function modifyArticle(ctx) {
   console.log('开始修改某篇文章');
   const id = ctx.params.id;
   const title = ctx.request.body.title;
+  const abstract = ctx.request.body.abstract;
   const content = ctx.request.body.content;
   // const publish = ctx.request.body.publish;
   if (title === '') {
@@ -129,7 +144,7 @@ const modifyArticle = async (ctx) => {
 }
 
 // 获取特定文章
-const getSpecArticle = async (ctx) => {
+exports.getSpecArticle = async function getSpecArticle(ctx) {
   const id = ctx.params.id;
   if (id === '') {
     ctx.throw(400, 'id不能为空');
@@ -149,7 +164,7 @@ const getSpecArticle = async (ctx) => {
 }
 
 // 删除特定文章
-const deleteArticle = async (ctx) => {
+exports.deleteArticle = async function deleteArticle(ctx) {
   const id = ctx.params.id;
   const article = await Article.findByIdAndRemove(id).catch(err => {
     if (err.name === 'CastError') {
@@ -164,7 +179,7 @@ const deleteArticle = async (ctx) => {
 }
 
 // 将某篇文章状态设置为发布
-const publishArticle = async (ctx) => {
+exports.publishArticle = async function publishArticle(ctx) {
   const id = ctx.params.id;
   const article = await Article.findByIdAndUpdate(id, { $set: {publish: true}}).catch(err => {
     if (err.name === 'CastError') {
@@ -179,7 +194,7 @@ const publishArticle = async (ctx) => {
 }
 
 // 将某篇文章状态设置为未发布
-const notPublishArticle = async (ctx) => {
+exports.notPublishArticle = async function notPublishArticle(ctx) {
   const id = ctx.params.id;
   const article = await Article.findByIdAndUpdate(id, {$set: {publish: false}}).catch(err => {
     if (err.name === 'CastError') {
@@ -192,14 +207,3 @@ const notPublishArticle = async (ctx) => {
     success: true,
   };
 }
-
-module.exports = {
-  createArticle,
-  findAllArticles,
-  findAllPublishArticles,
-  modifyArticle,
-  getSpecArticle,
-  deleteArticle,
-  publishArticle,
-  notPublishArticle,
-};

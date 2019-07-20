@@ -21,10 +21,11 @@ const findUser = (username) => {
   });
 };
 
-const Login = async (ctx) => {
+exports.login = async function login(ctx) {
   console.log(ctx.request.body);
   let username = ctx.request.body.username;
   let password = ctx.request.body.password;
+  console.log('登录信息', ctx.request.body);
   // let password = sha1(ctx.request.body.password);
   // console.log(username, password);
   let user = await findUser(username).catch(err => console.log(err));
@@ -33,7 +34,7 @@ const Login = async (ctx) => {
     console.log('检查用户不存在');
     ctx.status = 200;
     ctx.body = {
-      info: false,
+      success: false,
     }
   } else if (user.password === password) {
     console.log('密码正确');
@@ -50,13 +51,9 @@ const Login = async (ctx) => {
     };
   } else {
     console.log('密码错误');
-    ctx.status = 200;
-    ctx.body = {
-      success: false,
-    };
+    ctx.status = 401;
+    // ctx.body = {
+    //   success: false,
+    // };
   }
 };
-
-module.exports = {
-  Login,
-}
