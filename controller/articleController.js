@@ -8,6 +8,7 @@ exports.fetchTotalNumber = async function fetchTotalNumber(ctx) {
     console.log(count);
   })
   console.log(total);
+  ctx.status = 200;
   ctx.body = {
     success: true,
     total: total,
@@ -51,6 +52,7 @@ exports.createArticle = async function createArticle(ctx) {
   //   createResult = res;
   // });
   console.log('文章创建成功');
+  ctx.status = 200;
   ctx.body = {
     success: true,
     article: createResult,
@@ -140,6 +142,7 @@ exports.modifyArticle = async function modifyArticle(ctx) {
       ctx.throw(500, '服务器错误');
     }
   });
+  ctx.status = 200;
   ctx.body = {
     success: true,
   };
@@ -163,6 +166,7 @@ exports.getSpecArticle = async function getSpecArticle(ctx) {
     return doc;
   });
   console.log(article);
+  ctx.status = 200;
   ctx.body = {
     success: true,
     article: article,
@@ -179,6 +183,7 @@ exports.deleteArticle = async function deleteArticle(ctx) {
       ctx.throw(500, '服务内部错误');
     }
   });
+  ctx.status = 200;
   ctx.body = {
     success: true,
   };
@@ -194,6 +199,7 @@ exports.publishArticle = async function publishArticle(ctx) {
       ctx.throw(500, '服务器出错');
     }
   });
+  ctx.status = 200;
   ctx.body = {
     success: true,
   };
@@ -209,6 +215,7 @@ exports.notPublishArticle = async function notPublishArticle(ctx) {
       ctx.throw(500, '服务器错误');
     }
   });
+  ctx.status = 200;
   ctx.body = {
     success: true,
   };
