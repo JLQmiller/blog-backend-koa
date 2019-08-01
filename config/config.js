@@ -4,7 +4,7 @@ const config = {
     baseApi: '/api',
   },
   mongodb: {
-    url: 'mongodb://localhost:27017/mock',
+    url: 'mongodb://localhost:27017/blog',
   },
   jwt: {
     secret: 'iLoveCC',
