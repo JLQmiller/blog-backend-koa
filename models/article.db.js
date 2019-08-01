@@ -7,9 +7,7 @@ const article = {
   title: String,
   abstract: String,
   content: String,
-  creatTime: {
-    type: Date,
-  },
+  creatTime: Date,
   publish: Boolean,
 }
 // 生成文章信息数据结构Schema

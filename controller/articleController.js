@@ -1,23 +1,26 @@
 const Article = require('../models/article.db');
 
-/**
- * 创建文章
- * @param {*} ctx 
- * @api接口：
- *  title: string
- *  content: string
- *        
- */
+exports.fetchTotalNumber = async function fetchTotalNumber(ctx) {
+  const total = await Article.count({}, (err, count) => {
+    if (err) {
+      ctx.throw(500);
+    }
+    console.log(count);
+  })
+  console.log(total);
+  ctx.body = {
+    success: true,
+    total: total,
+  };
+}
+
 exports.createArticle = async function createArticle(ctx) {
-  console.log(`create req-body: ${ctx.request.body}`);
   const title = ctx.request.body.title;
   const abstract = ctx.request.body.abstract;
   const content = ctx.request.body.content;
   const createTime = new Date();
   const publish = ctx.request.body.publish;
   const article = await Article.findOne({'title': title});
-  console.log(ctx.request.body);
-  console.log(`查询重复的文章233： ${article}`);
   if (!!article) {
     ctx.body = {
       success: false,
@@ -36,7 +39,7 @@ exports.createArticle = async function createArticle(ctx) {
     title,
     abstract,
     content,
-    // createTime,
+    createTime,
     publish,
   });
   let createResult = await articleInfo.save().catch(err => {
@@ -58,10 +61,10 @@ exports.createArticle = async function createArticle(ctx) {
 const findPaging = (pageNumber, pageSize) => {
   console.log('start findArticles');
   return new Promise((resolve, reject) => {
-    Article.find({})
+    Article.find({}, {title: 1, abstract: 1, _id: 1, createTime: 1})
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
-    .sort({ createTime: -1 })
+    .sort({ _id: -1 })
     .exec((err, doc) => {
       if (err) {
         reject(err);
@@ -78,8 +81,7 @@ exports.findAllArticles =  async function findAllArticles(ctx) {
   let pageNumber = ctx.request.body.pageNumber;
   let pageSize = ctx.request.body.pageSize;
   let doc = await findPaging(pageNumber, pageSize);
-  // console.log(doc);
-  console.log('文章为空');
+  console.log(doc);
   ctx.status = 200;
   ctx.body = {
     body: doc,
@@ -149,12 +151,16 @@ exports.getSpecArticle = async function getSpecArticle(ctx) {
   if (id === '') {
     ctx.throw(400, 'id不能为空');
   }
-  const article = await Article.findById(id).catch(err => {
-    if (err.name === 'CastError' ) {
-      ctx.throw(400, 'id不存在');
-    } else {
-      ctx.throw(500, '服务器内部错误');
+  console.log(`params/:id:  ${ctx.params.id}`)
+  const article = await Article.findById(id, function(err, doc) {
+    if (err) {
+      if (err.name === 'CastError' ) {
+        ctx.throw(400, 'id不存在');
+      } else {
+        ctx.throw(500, '服务器内部错误');
+      }
     }
+    return doc;
   });
   console.log(article);
   ctx.body = {
@@ -206,4 +212,11 @@ exports.notPublishArticle = async function notPublishArticle(ctx) {
   ctx.body = {
     success: true,
   };
+}
+
+exports.articleImage = async function articleImage(ctx, next) {
+  const body = ctx.request.body;
+  console.log(body);
+  // const articleId = body.fields.pic;
+  // console.log(articleId);
 }

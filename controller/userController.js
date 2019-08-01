@@ -25,6 +25,7 @@ exports.login = async function login(ctx) {
   console.log(ctx.request.body);
   let username = ctx.request.body.username;
   let password = ctx.request.body.password;
+  console.log()
   console.log('登录信息', ctx.request.body);
   // let password = sha1(ctx.request.body.password);
   // console.log(username, password);

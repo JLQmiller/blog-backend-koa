@@ -5,7 +5,7 @@ const json = require('koa-json');
 const error = require('koa-json-error');
 const routing = require('./router/index');
 const mongoose = require('mongoose');
-const bodyParser = require('koa-bodyparser');
+const koaBody = require('koa-body');
 
 function formatError(err) {
 	return {
@@ -29,7 +29,9 @@ mongoose.connection.on('error', console.error);
 
 app.use(logger());
 app.use(json());
-app.use(bodyParser());
+app.use(koaBody({
+	multipart: true,
+}))
 
 app.use(async (ctx, next) => {
 	console.log(`请求信息： \n 方式： ${ctx.request.method}  \n 地址： ${ctx.request.url}`);
