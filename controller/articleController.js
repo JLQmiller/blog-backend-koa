@@ -66,7 +66,7 @@ const findPaging = (pageNumber, pageSize) => {
     Article.find({}, {title: 1, abstract: 1, _id: 1, createTime: 1})
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
-    .sort({ _id: -1 })
+    .sort({ createTime: -1 })
     .exec((err, doc) => {
       if (err) {
         reject(err);
